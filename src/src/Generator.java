@@ -1,8 +1,9 @@
 public class Generator {
 
-    private long a = 1664525;
-    private long c = 1013904223;
-    private long M = (long) Math.pow(2, 32);
+    //alteramos os valores conforme disse o professor
+    private long a = 1687454;
+    private long c = 1048724884;
+    private long M = 1801007006028L;
     private long seed;
     private int randomCount;
 

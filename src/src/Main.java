@@ -1,27 +1,31 @@
 import java.util.ArrayList;
 import java.util.List;
-
+import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {
+        ConfigLoader loader = new ConfigLoader();
+        try {
+            // Aqui a gente ta usando o que vem junto sem importar por parametro.
+            loader.load("src/src/test.yml");
+        } catch (IOException e) {
+            System.err.println("Error loading config: " + e.getMessage());
+            return;
+        }
 
-        // Queue 1 - G/G/2/3
-        Queue q1 = new Queue("Queue 1", 3, 2, 1.0, 4.0, 3.0, 4.0);
+        System.out.println("#### ESSE SIMULADOR FOI FEITO POR: ANDRÉ MACHADO, JOÃO FILIPE, RICARDO BATISTA E LUANA ####");
 
-        // Queue 2 - G/G/1/5
-        Queue q2 = new Queue("Queue 2", 5, 1, 0.0, 0.0, 2.0, 3.0);
-
-        q1.addRoute(q2, 1.0);
-
-        List<Queue> queues = new ArrayList<>();
-        queues.add(q1);
-        queues.add(q2);
-
-        Generator generator = new Generator(12345, 100000);
-
+        List<Queue> queues = new ArrayList<>(loader.queues.values());
+        Generator generator = new Generator(loader.seed, loader.randoms);
         Simulator simulator = new Simulator(queues, generator);
 
-        simulator.schedule(new Event(Event.Type.ARRIVAL, 1.5, q1));
+        
+        for (ConfigLoader.InitialArrival ia : loader.initialArrivals) {
+            Queue q = loader.queues.get(ia.queueName);
+            if (q != null) {
+                simulator.schedule(new Event(Event.Type.ARRIVAL, ia.time, q));
+            }
+        }
 
         simulator.simulate();
     }

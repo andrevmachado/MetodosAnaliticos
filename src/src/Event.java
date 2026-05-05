@@ -1,6 +1,6 @@
 public class Event implements Comparable<Event> {
     public enum Type {
-        ARRIVAL, DEPARTURE, TRANSFER
+        ARRIVAL, SERVICE_END
     }
 
     private Type type;

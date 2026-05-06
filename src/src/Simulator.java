@@ -35,7 +35,7 @@ public class Simulator {
             if (e.getType() == Event.Type.ARRIVAL) {
                 processArrival(e.getSourceQueue());
             } else if (e.getType() == Event.Type.SERVICE_END) {
-                processServiceEnd(e.getSourceQueue());
+                processServiceEnd(e);
             }
 
             if (!generator.hasRandom()) break;
@@ -44,7 +44,6 @@ public class Simulator {
     }
 
     private void processArrival(Queue q) {
-
         if (q.getCurrentState() < q.getCapacity()) {
             q.setCurrentState(q.getCurrentState() + 1);
             if (q.getCurrentState() <= q.getServers()) {
@@ -64,16 +63,7 @@ public class Simulator {
     }
 
     private void scheduleService(Queue q) {
-        double rnd = generator.nextRandom();
-        if (rnd != -1) {
-            double serviceTime = q.getServiceMin() + (q.getServiceMax() - q.getServiceMin()) * rnd;
-            scheduler.add(new Event(Event.Type.SERVICE_END, globalTime + serviceTime, q));
-        }
-    }
-
-    private void processServiceEnd(Queue q) {
-        q.setCurrentState(q.getCurrentState() - 1);
-
+        Queue destination = null;
         if (!q.getRoutes().isEmpty()) {
             double rnd = generator.nextRandom();
             if (rnd != -1) {
@@ -81,15 +71,32 @@ public class Simulator {
                 for (Queue.Route route : q.getRoutes()) {
                     sum += route.probability;
                     if (rnd <= sum) {
-                        handleInternalArrival(route.destination);
+                        destination = route.destination;
                         break;
                     }
                 }
             }
         }
 
+        double rnd = generator.nextRandom();
+        if (rnd != -1) {
+            double serviceTime = q.getServiceMin() + (q.getServiceMax() - q.getServiceMin()) * rnd;
+            scheduler.add(new Event(Event.Type.SERVICE_END, globalTime + serviceTime, q, destination));
+        }
+    }
+
+    private void processServiceEnd(Event e) {
+        Queue q = e.getSourceQueue();
+        Queue destination = e.getDestinationQueue();
+
+        q.setCurrentState(q.getCurrentState() - 1);
+
         if (q.getCurrentState() >= q.getServers()) {
             scheduleService(q);
+        }
+
+        if (destination != null) {
+            handleInternalArrival(destination);
         }
     }
 

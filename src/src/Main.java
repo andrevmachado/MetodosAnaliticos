@@ -16,7 +16,12 @@ public class Main {
         System.out.println("#### ESSE SIMULADOR FOI FEITO POR: ANDRÉ MACHADO, JOÃO FILIPE, RICARDO BATISTA E LUANA ####");
 
         List<Queue> queues = new ArrayList<>(loader.queues.values());
-        Generator generator = new Generator(loader.seed, loader.randoms);
+        Generator generator;
+        if (loader.usePredefinedRandoms) {
+            generator = new Generator(loader.rndNumbers);
+        } else {
+            generator = new Generator(loader.seed, loader.randoms);
+        }
         Simulator simulator = new Simulator(queues, generator);
 
         

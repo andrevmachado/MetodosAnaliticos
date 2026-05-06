@@ -6,6 +6,9 @@ import java.util.*;
 public class ConfigLoader {
     public long seed;
     public int randoms;
+    public List<Double> rndNumbers = new ArrayList<>();
+    public boolean usePredefinedRandoms = false;
+    private List<Long> seeds = new ArrayList<>();
     public Map<String, Queue> queues = new HashMap<>();
     public List<InitialArrival> initialArrivals = new ArrayList<>();
 
@@ -38,7 +41,11 @@ public class ConfigLoader {
                 } else if (line.equals("seeds:")) {
                     currentSection = "seeds";
                 } else if (currentSection.equals("seeds") && line.startsWith("-")) {
-                    seed = Long.parseLong(line.substring(1).trim());
+                    seeds.add(Long.parseLong(line.substring(1).trim()));
+                } else if (line.equals("rndnumbers:")) {
+                    currentSection = "rndnumbers";
+                } else if (currentSection.equals("rndnumbers") && line.startsWith("-")) {
+                    rndNumbers.add(Double.parseDouble(line.substring(1).trim()));
                 } else if (line.equals("queues:")) {
                     currentSection = "queues";
                 } else if (line.equals("network:")) {
@@ -55,13 +62,17 @@ public class ConfigLoader {
                         }
                     }
                 } else if (currentSection.equals("network")) {
-                    if (line.startsWith("- source:")) {
+                    // limpa tudo que é coisa aqui
+                    String cleanLine = line.replace("\u00A0", " ").trim();
+
+                    if (cleanLine.startsWith("-") && cleanLine.contains("source:")) {
                         RouteData rd = new RouteData();
-                        rd.source = line.substring(9).trim();
-                        String targetLine = br.readLine().split("#")[0].trim();
-                        rd.target = targetLine.substring(7).trim();
-                        String probLine = br.readLine().split("#")[0].trim();
-                        rd.probability = Double.parseDouble(probLine.substring(12).trim());
+                        rd.source = cleanLine.split("source:")[1].trim();
+                        String targetLine = br.readLine().split("#")[0].replace("\u00A0", " ").trim();
+                        rd.target = targetLine.split("target:")[1].trim();
+                        String probLine = br.readLine().split("#")[0].replace("\u00A0", " ").trim();
+                        rd.probability = Double.parseDouble(probLine.split("probability:")[1].trim());
+
                         routeDataList.add(rd);
                     }
                 } else if (currentSection.equals("arrivals")) {
@@ -75,6 +86,15 @@ public class ConfigLoader {
                 }
             }
         }
+
+        if (!seeds.isEmpty()) {
+            seed = seeds.get(0);
+            usePredefinedRandoms = false;
+        } else if (!rndNumbers.isEmpty()) {
+            usePredefinedRandoms = true;
+            randoms = rndNumbers.size();
+        }
+
         finalizeQueues();
     }
 

@@ -44,6 +44,7 @@ public class Simulator {
     }
 
     private void processArrival(Queue q) {
+
         if (q.getCurrentState() < q.getCapacity()) {
             q.setCurrentState(q.getCurrentState() + 1);
             if (q.getCurrentState() <= q.getServers()) {
@@ -52,7 +53,6 @@ public class Simulator {
         } else {
             q.incrementLosses();
         }
-
 
         if (q.getArrivalMin() > 0 || q.getArrivalMax() > 0) {
             double rnd = generator.nextRandom();
@@ -73,16 +73,8 @@ public class Simulator {
 
     private void processServiceEnd(Queue q) {
         q.setCurrentState(q.getCurrentState() - 1);
-        
-        
-        if (q.getCurrentState() >= q.getServers()) {
-            scheduleService(q);
-        }
 
-        
-        if (q.getRoutes().isEmpty()) {
-            // tchau
-        } else {
+        if (!q.getRoutes().isEmpty()) {
             double rnd = generator.nextRandom();
             if (rnd != -1) {
                 double sum = 0;
@@ -90,11 +82,14 @@ public class Simulator {
                     sum += route.probability;
                     if (rnd <= sum) {
                         handleInternalArrival(route.destination);
-                        return;
+                        break;
                     }
                 }
-                
             }
+        }
+
+        if (q.getCurrentState() >= q.getServers()) {
+            scheduleService(q);
         }
     }
 

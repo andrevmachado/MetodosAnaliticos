@@ -22,8 +22,7 @@ loader.load("src/src/test.yml");
 1. Abra o projeto na sua IDE preferida (IntelliJ, por exemplo).
 2. A pasta `src/src` é o diretório de código-fonte.
 3. Configure a classe de execução como `Main`.
-4. Garanta que o diretório de trabalho esteja na raiz do projeto:
-   `E:\Apps\High Jump\MetodosAnaliticos\MetodosAnaliticos`
+4. Garanta que o diretório de trabalho esteja na raiz do projeto
 5. Execute a aplicação normalmente pela IDE.
 
 ## Como executar pela linha de comando

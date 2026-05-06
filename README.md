@@ -1,6 +1,11 @@
 # Métodos Analíticos
 
-Projeto em Java para simulação de filas e redes de atendimento.
+Projeto em Java para simulação de filas.
+Desenvolvido por:
+   André Machado,
+   João Filipe Farah da Rocha,
+   Ricardo Batista,
+   Luana T.
 
 ## Arquivo principal
 
